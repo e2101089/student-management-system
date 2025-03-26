@@ -4,26 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <title>Chi Tiết Học Sinh</title>
+    <title>Student Detail</title>
 </head>
 <body>
     <div class="container">
-        <h2>Chi Tiết Học Sinh</h2>
+        <h2>Student Detail</h2>
         <h3 id="studentName"></h3>
         <p>Email: <span id="studentEmail"></span></p>
-        <p>Điện thoại: <span id="studentPhone"></span></p>
-        <h4>Nhập Điểm</h4>
-        <input type="number" id="score" placeholder="Điểm">
-        <input type="text" id="comment" placeholder="Nhận xét">
-        <button onclick="submitGrade()">Gửi Điểm</button>
-        <h4>Điểm đã nhập</h4>
+        <p>Phone number: <span id="studentPhone"></span></p>
+        <h4>Add Grade</h4>
+        <input type="number" id="score" placeholder="Grade">
+        <input type="text" id="comment" placeholder="Comment">
+        <button onclick="submitGrade()">Send Grade</button>
+        <h4>Grade List</h4>
         <ul id="gradeList"></ul>
         <script>
             const urlParams = new URLSearchParams(window.location.search);
             const studentId = urlParams.get('id');
 
             async function fetchStudent() {
-                const response = await fetch(`http://localhost:3000/students/${studentId}`);
+                const response = await fetch(`/students/${studentId}`);
                 const student = await response.json();
                 document.getElementById('studentName').innerText = student.name;
                 document.getElementById('studentEmail').innerText = student.email;
@@ -32,13 +32,13 @@
             }
 
             async function fetchGrades() {
-                const response = await fetch(`http://localhost:3000/students/${studentId}/grades`);
+                const response = await fetch(`students/${studentId}/grades`);
                 const grades = await response.json();
                 const gradeList = document.getElementById('gradeList');
                 gradeList.innerHTML = '';
                 grades.forEach(grade => {
                     const li = document.createElement('li');
-                    li.innerHTML = `Điểm: ${grade.score}, Nhận xét: ${grade.comment}`;
+                    li.innerHTML = `Score: ${grade.score}, Comment: ${grade.comment}`;
                     gradeList.appendChild(li);
                 });
             }
@@ -48,7 +48,7 @@
                 const comment = document.getElementById('comment').value;
 
                 if (score && comment) {
-                    await fetch(`http://localhost:3000/students/${studentId}/grades`, {
+                    await fetch(`students/${studentId}/grades`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -59,7 +59,7 @@
                     document.getElementById('comment').value = '';
                     fetchGrades();
                 } else {
-                    alert("Vui lòng điền đầy đủ thông tin điểm.");
+                    alert("Please fill all requirements.");
                 }
             }
 

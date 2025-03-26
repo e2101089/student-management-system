@@ -15,8 +15,8 @@ const CourseList = () => {
 
     return (
         <div>
-            <h2>Danh Sách Khóa Học</h2>
-            <Link to="/courses/new">Thêm Khóa Học</Link>
+            <h2>Course List</h2>
+            <Link to="/courses/new">Add course</Link>
             <ul>
                 {courses.map(course => (
                     <li key={course._id}>

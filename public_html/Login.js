@@ -15,29 +15,29 @@ const Login = () => {
             navigate('/dashboard');
         } catch (error) {
             console.error('Login failed:', error);
-            alert('Sai tên đăng nhập hoặc mật khẩu!');
+            alert('Error name or password!');
         }
     };
 
     return (
         <div>
-            <h2>Đăng Nhập</h2>
+            <h2>Sign in</h2>
             <form onSubmit={handleSubmit}>
                 <input
                     type="text"
-                    placeholder="Tên đăng nhập"
+                    placeholder="Username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
                 />
                 <input
                     type="password"
-                    placeholder="Mật khẩu"
+                    placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                 />
-                <button type="submit">Đăng Nhập</button>
+                <button type="submit">Sign in</button>
             </form>
         </div>
     );

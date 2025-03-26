@@ -4,30 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <title>Danh Sách Khóa Học</title>
+    <title>Course List</title>
 </head>
 <body>
     <div class="container">
-        <h2>Danh Sách Khóa Học</h2>
-        <button onclick="addCourse()">Thêm Khóa Học</button>
+        <h2>Course List</h2>
+        <button onclick="addCourse()">Add course</button>
         <ul id="courseList"></ul>
         <script>
             async function fetchCourses() {
-                const response = await fetch('http://localhost:3000/courses');
+                const response = await fetch('/courses');
                 const courses = await response.json();
                 const courseList = document.getElementById('courseList');
                 courseList.innerHTML = '';
                 courses.forEach(course => {
                     const li = document.createElement('li');
-                    li.innerHTML = `${course.name} <button onclick="deleteCourse(${course.id})">Xóa</button> <a href="course_detail.html?id=${course.id}">Chi tiết</a>`;
+                    li.innerHTML = `${course.name} <button onclick="deleteCourse(${course.id})">Delete</button> <a href="course_detail.html?id=${course.id}">Detail</a>`;
                     courseList.appendChild(li);
                 });
             }
 
             async function addCourse() {
-                const courseName = prompt("Nhập tên khóa học:");
+                const courseName = prompt("Fill the course name:");
                 if (courseName) {
-                    await fetch('http://localhost:3000/courses', {
+                    await fetch('/courses', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -39,7 +39,7 @@
             }
 
             async function deleteCourse(id) {
-                await fetch(`http://localhost:3000/courses/${id}`, {
+                await fetch(`/courses/${id}`, {
                     method: 'DELETE'
                 });
                 fetchCourses();

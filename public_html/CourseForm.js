@@ -9,7 +9,7 @@ const CourseForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:4000/courses', { name: courseName });
+            await axios.post('/courses', { name: courseName });
             history.push('/courses');
         } catch (error) {
             console.error('Error adding course:', error);
@@ -18,16 +18,16 @@ const CourseForm = () => {
 
     return (
         <div>
-            <h2>Thêm Khóa Học</h2>
+            <h2>Add course</h2>
             <form onSubmit={handleSubmit}>
                 <input
                     type="text"
-                    placeholder="Tên Khóa Học"
+                    placeholder="Course name"
                     value={courseName}
                     onChange={(e) => setCourseName(e.target.value)}
                     required
                 />
-                <button type="submit">Thêm Khóa Học</button>
+                <button type="submit">Add course</button>
             </form>
         </div>
     );
