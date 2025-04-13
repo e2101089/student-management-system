@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Courses</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <h1>Course Management</h1>
+  <button onclick="location.href='dashboard.html'">Back</button>
+  <form id="newCourseForm">
+    <input type="text" id="title" placeholder="Course title" required>
+    <textarea id="description" placeholder="Description"></textarea>
+    <button type="submit">Add Course</button>
+  </form>
+  <ul id="courseList"></ul>
+  <script src="js/courses.js"></script>
+</body>
+</html>
