@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Attendance & Grades</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h2>Manage Attendance & Grades</h2>
+
+    <!-- Course ID input -->
+    <label for="courseIdInput">Course ID: </label>
+    <input type="number" id="courseIdInput" required>
+    <button onclick="loadStudents()">Load Students</button>
+    <br><br>
+
+    <div id="studentsList"></div>
+
+    <script>
+        // Fetch students based on the Course ID entered
+        async function loadStudents() {
+            const course_id = document.getElementById('courseIdInput').value;
+            if (!course_id) {
+                alert('Please enter a valid Course ID');
+                return;
+            }
+            const res = await fetch(`http://localhost:5000/api/course-students/students/${courseId}`);
+            const students = await res.json();
+
+            const html = students.map(student => `
+                <div class="student-container">
+                    <h4>${student.name}</h4>
+                    <p>Email: ${student.email}</p>
+
+                    <!-- Attendance Form -->
+                    <form onsubmit="submitAttendance(event, ${student.id}, ${courseId})">
+                        <label>Date: <input type="date" name="date" required></label>
+                        <select name="status">
+                            <option value="Present">Present</option>
+                            <option value="Absent">Absent</option>
+                        </select>
+                        <button type="submit">Mark Attendance</button>
+                    </form>
+
+                    <!-- Grade Form -->
+                    <form onsubmit="submitGrade(event, ${student.id}, ${courseId})">
+                        <label>Score: <input type="number" step="0.01" name="score" required></label>
+                        <button type="submit">Submit Grade</button>
+                    </form>
+                </div>
+            `).join('');
+
+            document.getElementById('studentsList').innerHTML = html;
+        }
+
+        // Submit Attendance for a student
+        async function submitAttendance(e, studentid, courseId) {
+            e.preventDefault();
+            const form = e.target;
+            const date = form.date.value;
+            const status = form.status.value;
+
+            const res = await fetch('http://localhost:5000/api/course-students/attendance', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ student_id: student_id, course_id: course_id, date, status })
+            });
+
+            const data = await res.json();
+            alert(data.message);
+        }
+
+        // Submit Grade for a student
+        async function submitGrade(e, student_id, course_id) {
+            e.preventDefault();
+            const form = e.target;
+            const score = form.score.value;
+
+            const res = await fetch('http://localhost:5000/api/course-students/grade', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ student_id: student_id, course_id: course_id, score })
+            });
+
+            const data = await res.json();
+            alert(data.message);
+        }
+    </script>
+</body>
+</html>

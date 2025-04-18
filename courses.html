@@ -2,18 +2,180 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Courses</title>
-  <link rel="stylesheet" href="css/style.css">
+  <title>Manage Courses</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .message {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+    }
+    .success { background-color: #d4edda; color: #155724; }
+    .error { background-color: #f8d7da; color: #721c24; }
+    ul { list-style: none; padding: 0; }
+    li { margin: 8px 0; }
+    button { margin-left: 10px; }
+
+    /* Thêm style cho thanh menu */
+    nav {
+      background-color: #333;
+      padding: 10px;
+      text-align: right;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 15px;
+      font-size: 16px;
+    }
+
+    nav a:hover {
+      color: #ddd;
+    }
+  </style>
 </head>
 <body>
-  <h1>Course Management</h1>
-  <button onclick="location.href='dashboard.html'">Back</button>
-  <form id="newCourseForm">
-    <input type="text" id="title" placeholder="Course title" required>
-    <textarea id="description" placeholder="Description"></textarea>
+  <!-- Thanh menu -->
+  <nav>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="index.html" id="logout">Logout</a>
+  </nav>
+
+  <h2>Manage Your Courses</h2>
+
+  <!-- Add Course Form -->
+  <form id="addCourseForm">
+    <input type="text" id="addCourseName" placeholder="New Course Name" required>
+    <input type="text" id="addCourseId" placeholder="New Course ID" required>
     <button type="submit">Add Course</button>
   </form>
-  <ul id="courseList"></ul>
-  <script src="js/courses.js"></script>
+
+  <!-- Delete Course Form -->
+  <form id="deleteCourseForm">
+    <input type="text" id="deleteCourseName" placeholder="Course Name" required>
+    <input type="text" id="deleteCourseId" placeholder="Course ID" required>
+    <button type="submit">Delete Course</button>
+  </form>
+
+  <!-- Message box -->
+  <div id="messageBox"></div>
+
+  <h3>Your Courses</h3>
+  <ul id="courseList">
+    <!-- Danh sách khóa học sẽ được hiển thị ở đây -->
+  </ul>
+
+  <script>
+    const teacherId = 1; // giả định tạm
+
+    document.addEventListener('DOMContentLoaded', loadCourses);
+
+    // Xử lý thêm khóa học
+    document.getElementById('addCourseForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('addCourseName').value.trim();
+      const course_id = document.getElementById('addCourseId').value.trim();
+      if (!name) return showMessage('Course name is required', false);
+
+      try {
+        const res = await fetch('http://localhost:5000/api/courses', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, course_id })
+        });
+
+        const result = await res.json();
+        if (res.ok) {
+          showMessage(result.message || 'Course added successfully', true);
+          document.getElementById('addCourseName').value = '';
+          loadCourses();
+        } else {
+          showMessage(result.message || 'Failed to add course', false);
+        }
+      } catch (err) {
+        showMessage('Server error while adding course', false);
+      }
+    });
+
+    // Xử lý xóa khóa học theo tên
+    document.getElementById('deleteCourseForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('deleteCourseName').value.trim();
+      const courseId = document.getElementById('deleteCourseId').value.trim();
+
+      if (!courseId || !name) return showMessage('Please enter course name and ID to delete', false);
+
+      try {
+        const res = await fetch('http://localhost:5000/api/courses');
+        const courses = await res.json();
+
+        const courseToDelete = courses.find(course =>
+          course.name.toLowerCase() === name.toLowerCase() &&
+          course.course_id == courseId
+        );
+
+        if (!courseToDelete) {
+          return showMessage('Course not found', false);
+        }
+
+        const deleteRes = await fetch('http://localhost:5000/api/courses', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, course_id: courseId })
+        });
+
+        const result = await deleteRes.json();
+
+        if (deleteRes.ok) {
+          showMessage(result.message || 'Course deleted successfully', true);
+          document.getElementById('deleteCourseForm').reset();
+          loadCourses();
+        } else {
+          showMessage(result.message || 'Failed to delete course', false);
+        }
+      } catch (err) {
+        console.error('Error deleting course:', err);
+        showMessage('Server error while deleting course', false);
+      }
+    });
+
+    // Hiển thị danh sách khóa học
+    async function loadCourses() {
+      try {
+        const res = await fetch('http://localhost:5000/api/courses');
+        const courses = await res.json();  // Lấy dữ liệu từ backend
+
+        const courseList = document.getElementById('courseList');
+        courseList.innerHTML = '';  // Xóa danh sách khóa học cũ
+
+        // Kiểm tra và hiển thị các khóa học
+        if (courses.length === 0) {
+          courseList.innerHTML = '<li>No courses found</li>';
+          return;
+        }
+
+        // Hiển thị khóa học và tạo liên kết đến trang sinh viên
+        courses.forEach(course => {
+          const li = document.createElement('li');
+          const link = document.createElement('a');
+          link.href = `student_list.html?courseId=${course.course_id}`;  // Tạo liên kết tới trang student
+          link.textContent = `${course.name} (Course ID: ${course.course_id})`;
+          li.appendChild(link);
+          courseList.appendChild(li);
+        });
+      } catch (err) {
+        console.error('Error loading courses:', err);
+        showMessage('Error loading courses', false);
+      }
+    }
+
+    function showMessage(msg, success = true) {
+      const box = document.getElementById('messageBox');
+      box.innerHTML = `<div class="message ${success ? 'success' : 'error'}">${msg}</div>`;
+      setTimeout(() => box.innerHTML = '', 3000);
+    }
+  </script>
 </body>
 </html>

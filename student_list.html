@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Students in Course</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .container {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <h2>Students in Course</h2>
+  <button onclick="history.back()">← Back</button>
+
+  <div id="studentList"></div>
+
+  <h3>Add Student to Course</h3>
+  <form id="addStudentForm">
+    <input type="number" id="studentId" placeholder="Student ID" required>
+    <input type="text" id="studentName" placeholder="Student Name" required>
+    <input type="email" id="studentEmail" placeholder="Student Email" required>
+    <input type="text" id="studentPhone" placeholder="Student Phone" required>
+    <button type="submit">Add Student</button>
+  </form>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const course_id = urlParams.get('courseId');
+
+    async function fetchStudents() {
+  const res = await fetch(`http://localhost:5000/api/students/course/${course_id}/students`);
+  const students = await res.json();
+  console.log("API Response:", students); // In toàn bộ phản hồi từ API
+
+  // Kiểm tra nếu có lỗi trong phản hồi
+  if (students.message === "Database error") {
+    console.error("Database error:", students.error); // In chi tiết lỗi
+    return alert("An error occurred while fetching students. Check the console for more details.");
+  }
+
+  // Kiểm tra nếu dữ liệu không phải là mảng
+
+
+  const list = students.map(s => `
+    <div class="container">
+      <h3>${s.name}</h3>
+      <p>Email: ${s.email}</p>
+      <p>Phone: ${s.phone}</p>
+      <button onclick="openAttendance(${s.id})">Attendance</button>
+      <button onclick="openGrade(${s.id})">Grade</button>
+      <button onclick="removeStudent(${s.id})">Remove</button>
+    </div>
+  `).join('');
+  document.getElementById('studentList').innerHTML = list;
+}
+
+
+    async function openAttendance(studentId) {
+      const date = prompt("Date (YYYY-MM-DD):");
+      const status = prompt("Status (present/absent/late):");
+      const res = await fetch('http://localhost:5000/api/students/attendance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enrollment_id: studentId, date, status })
+      });
+      const data = await res.json();
+      alert(data.message);
+    }
+
+    async function openGrade(studentId) {
+      const subject = prompt("Subject:");
+      const score = prompt("Score:");
+      const comment = prompt("Comment:");
+      const behavior = prompt("Behavior:");
+      const res = await fetch('http://localhost:5000/api/students/grade', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enrollment_id: studentId, subject, score, comment, behavior })
+      });
+      const data = await res.json();
+      alert(data.message);
+    }
+
+    // Add student to course
+    document.getElementById('addStudentForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const studentId = document.getElementById('studentId').value.trim();
+      const studentName = document.getElementById('studentName').value.trim();
+      const studentEmail = document.getElementById('studentEmail').value.trim();
+      const studentPhone = document.getElementById('studentPhone').value.trim();
+
+      if (!studentId || !studentName || !studentEmail || !studentPhone) {
+        return alert("All fields are required");
+      }
+
+      try {
+        const res = await fetch('http://localhost:5000/api/enrollments', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            course_id: courseId,
+            student_id: studentId,
+            name: studentName,
+            email: studentEmail,
+            phone: studentPhone
+          })
+        });
+
+        const data = await res.json();
+        alert(data.message);
+        if (res.ok) {
+          document.getElementById('studentId').value = '';
+          document.getElementById('studentName').value = '';
+          document.getElementById('studentEmail').value = '';
+          document.getElementById('studentPhone').value = '';
+          fetchStudents();
+        }
+      } catch (err) {
+        alert("Error adding student");
+      }
+    });
+
+    // Remove student from course
+    async function removeStudent(studentId) {
+      if (!confirm("Are you sure to remove this student from the course?")) return;
+
+      try {
+        const res = await fetch(`http://localhost:5000/api/enrollments`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ course_id: courseId, student_id: studentId })
+        });
+
+        const data = await res.json();
+        alert(data.message);
+        if (res.ok) fetchStudents();
+      } catch (err) {
+        alert("Error removing student");
+      }
+    }
+
+    fetchStudents();
+  </script>
+</body>
+</html>

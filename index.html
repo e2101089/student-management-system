@@ -1,19 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login</title>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <h1>Login</h1>
-  <form id="loginForm">
-    <input type="text" id="username" placeholder="Username" required>
-    <input type="password" id="password" placeholder="Password" required>
+  <form id="LoginForm">
+    <input type="text" id="email" placeholder="Email" required />
+    <input type="password" id="password" placeholder="Password" required />
     <button type="submit">Login</button>
   </form>
   <p>Don't have an account? <a href="register.html">Register now</a></p>
-  <script src="js/auth.js"></script>
+  <p id="loginMessage" style="color: red;"></p>
+
+  <script>
+    document.getElementById('LoginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        const response = await fetch('http://localhost:5000/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({email, password }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          // Nếu đăng nhập thành công, chuyển đến dashboard
+          window.location.href = 'dashboard.html';
+        } else {
+          // Nếu đăng nhập thất bại, hiển thị thông báo lỗi
+          document.getElementById('loginMessage').textContent = data.message;
+        }
+      } catch (error) {
+        console.error('Error during login:', error);
+        document.getElementById('loginMessage').textContent =
+          'An error occurred. Please try again.';
+      }
+    });
+  </script>
 </body>
 </html>
