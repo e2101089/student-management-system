@@ -1,19 +1,23 @@
-const mysql = require('mysql');
+const mysql = require('mysql2/promise');
 
-const db = mysql.createConnection({
+const pool = mysql.createPool({
     host: 'mariadb.vamk.fi',
     user: 'e2101089',
-    password: 'SxtR6JNQAW7',
-    database: 'e2101089_studentmanagement'
+    password: 'FrcP25TGjgF',
+    database: 'e2101089_studentmanagement',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
 
-// Connect to the database
-db.connect(err => {
-    if (err) {
+// Test the connection
+pool.getConnection()
+    .then(connection => {
+        console.log('Connected to the database');
+        connection.release();
+    })
+    .catch(err => {
         console.error('Database connection error:', err);
-        return;
-    }
-    console.log('Connected to the database');
-});
+    });
 
-module.exports = db;
+module.exports = pool;

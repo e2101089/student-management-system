@@ -1,15 +1,294 @@
+<!-- student_list.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Students in Course</title>
   <link rel="stylesheet" href="style.css">
   <style>
     .container {
       border: 1px solid #ddd;
       border-radius: 8px;
-      padding: 10px;
+      padding: 15px;
       margin: 10px 0;
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .container h3 {
+      margin: 0 0 10px 0;
+      color: #333;
+    }
+
+    .container p {
+      margin: 5px 0;
+      color: #666;
+    }
+
+    .button-group {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .button-group button {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+
+    .button-group button:hover {
+      opacity: 0.9;
+    }
+
+    .error-message {
+      background-color: #ffebee;
+      border: 1px solid #ffcdd2;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 10px 0;
+      color: #c62828;
+    }
+
+    .no-students {
+      background-color: #f5f5f5;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 10px 0;
+      text-align: center;
+      color: #666;
+    }
+
+    #addStudentForm {
+      margin-top: 20px;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+    }
+
+    #addStudentForm input {
+      display: block;
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0 15px 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    #addStudentForm button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #addStudentForm button:hover {
+      background-color: #45a049;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 1000;
+      overflow-y: auto;
+    }
+
+    .modal-content {
+      position: relative;
+      background-color: #fff;
+      margin: 2% auto;
+      padding: 15px;
+      width: 95%;
+      max-width: 600px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .close {
+      position: absolute;
+      right: 20px;
+      top: 10px;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .record-list {
+      margin-top: 15px;
+      max-height: 200px;
+      overflow-y: auto;
+      border-top: 1px solid #ddd;
+      padding-top: 10px;
+    }
+
+    .record-list h4 {
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+
+    .record-item {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 10px;
+      margin-bottom: 8px;
+      background-color: #f9f9f9;
+    }
+
+    .record-item p {
+      margin: 4px 0;
+      font-size: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: bold;
+      color: #333;
+      font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 6px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    .form-group textarea {
+      height: 60px;
+      resize: vertical;
+    }
+
+    button[type="submit"] {
+      background-color: #4CAF50;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .modal-content {
+        width: 98%;
+        margin: 1% auto;
+        padding: 10px;
+      }
+
+      .form-group {
+        margin-bottom: 8px;
+      }
+
+      .form-group textarea {
+        height: 50px;
+      }
+
+      button[type="submit"] {
+        padding: 6px 12px;
+        font-size: 13px;
+      }
+    }
+
+    .chat-popup {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      right: 15px;
+      border: 3px solid #f1f1f1;
+      z-index: 9;
+      width: 300px;
+      background: white;
+      border-radius: 5px 5px 0 0;
+    }
+
+    .chat-header {
+      padding: 10px;
+      background: #4CAF50;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chat-messages {
+      height: 300px;
+      overflow-y: auto;
+      padding: 10px;
+    }
+
+    .chat-input {
+      padding: 10px;
+      border-top: 1px solid #ddd;
+      display: flex;
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 5px;
+      margin-right: 5px;
+    }
+
+    .message {
+      margin-bottom: 10px;
+      padding: 5px;
+      border-radius: 5px;
+    }
+
+    .message.sent {
+      background: #e3f2fd;
+      margin-left: 20%;
+    }
+
+    .message.received {
+      background: #f1f1f1;
+      margin-right: 20%;
+    }
+
+    .message-time {
+      font-size: 0.8em;
+      color: #666;
+      text-align: right;
+    }
+
+    .error-container {
+      text-align: center;
+      padding: 20px;
+      margin: 20px;
+      background-color: #ffebee;
+      border-radius: 5px;
+    }
+
+    .error-container button {
+      margin-top: 10px;
+      padding: 8px 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -28,124 +307,626 @@
     <button type="submit">Add Student</button>
   </form>
 
-  <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const course_id = urlParams.get('courseId');
-
-    async function fetchStudents() {
-  const res = await fetch(`http://localhost:5000/api/students/course/${course_id}/students`);
-  const students = await res.json();
-  console.log("API Response:", students); // In toàn bộ phản hồi từ API
-
-  // Kiểm tra nếu có lỗi trong phản hồi
-  if (students.message === "Database error") {
-    console.error("Database error:", students.error); // In chi tiết lỗi
-    return alert("An error occurred while fetching students. Check the console for more details.");
-  }
-
-  // Kiểm tra nếu dữ liệu không phải là mảng
-
-
-  const list = students.map(s => `
-    <div class="container">
-      <h3>${s.name}</h3>
-      <p>Email: ${s.email}</p>
-      <p>Phone: ${s.phone}</p>
-      <button onclick="openAttendance(${s.id})">Attendance</button>
-      <button onclick="openGrade(${s.id})">Grade</button>
-      <button onclick="removeStudent(${s.id})">Remove</button>
+  <!-- Attendance Modal -->
+  <div id="attendanceModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('attendanceModal')">&times;</span>
+      <h3>Record Attendance</h3>
+      <form id="attendanceForm">
+        <div class="form-group">
+          <label for="attendanceDate">Date:</label>
+          <input type="date" id="attendanceDate" required>
+        </div>
+        <div class="form-group">
+          <label for="attendanceStatus">Status:</label>
+          <select id="attendanceStatus" required>
+            <option value="present">Present</option>
+            <option value="absent">Absent</option>
+            <option value="late">Late</option>
+          </select>
+        </div>
+        <button type="submit">Record Attendance</button>
+      </form>
+      <div class="record-list" id="attendanceList">
+        <h4>Attendance History</h4>
+      </div>
     </div>
-  `).join('');
-  document.getElementById('studentList').innerHTML = list;
-}
+  </div>
 
+  <!-- Grade Modal -->
+  <div id="gradeModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('gradeModal')">&times;</span>
+      <h3>Record Grade</h3>
+      <form id="gradeForm">
+        <div class="form-group">
+          <label for="gradeScore">Grade:</label>
+          <input type="number" id="gradeScore" min="0" max="100" step="0.01" required>
+        </div>
+        <div class="form-group">
+          <label for="gradeComment">Comment:</label>
+          <textarea id="gradeComment" placeholder="Enter any additional comments about the grade" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="gradeBehavior">Behavior:</label>
+          <select id="gradeBehavior" required>
+            <option value="excellent">Excellent</option>
+            <option value="good">Good</option>
+            <option value="fair">Fair</option>
+            <option value="poor">Poor</option>
+          </select>
+        </div>
+        <button type="submit">Record Grade</button>
+      </form>
+      <div class="record-list" id="gradeList">
+        <h4>Grade History</h4>
+      </div>
+    </div>
+  </div>
 
-    async function openAttendance(studentId) {
-      const date = prompt("Date (YYYY-MM-DD):");
-      const status = prompt("Status (present/absent/late):");
-      const res = await fetch('http://localhost:5000/api/students/attendance', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ enrollment_id: studentId, date, status })
-      });
-      const data = await res.json();
-      alert(data.message);
-    }
+  <!-- Chat Modal -->
+  <div id="chatModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Chat with Student</h2>
+      <div id="chatMessages"></div>
+      <div class="chat-input">
+        <input type="text" id="messageInput" placeholder="Type your message...">
+        <button onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+  </div>
 
-    async function openGrade(studentId) {
-      const subject = prompt("Subject:");
-      const score = prompt("Score:");
-      const comment = prompt("Comment:");
-      const behavior = prompt("Behavior:");
-      const res = await fetch('http://localhost:5000/api/students/grade', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ enrollment_id: studentId, subject, score, comment, behavior })
-      });
-      const data = await res.json();
-      alert(data.message);
-    }
-
-    // Add student to course
-    document.getElementById('addStudentForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const studentId = document.getElementById('studentId').value.trim();
-      const studentName = document.getElementById('studentName').value.trim();
-      const studentEmail = document.getElementById('studentEmail').value.trim();
-      const studentPhone = document.getElementById('studentPhone').value.trim();
-
-      if (!studentId || !studentName || !studentEmail || !studentPhone) {
-        return alert("All fields are required");
+  <script>
+    const course_id = new URLSearchParams(window.location.search).get('course_id');
+    let currentStudentId = null;
+    let currentTeacher = null;
+    let currentUser = null;
+   
+    function checkCourseId() {
+      if (!course_id) {
+        alert('Course ID is required');
+        window.location.href = 'courses.html';
+        return;
       }
+    }
+   
+    checkCourseId();
+
+    // Get current teacher from database
+    async function getCurrentTeacher() {
+      try {
+        const response = await fetch('http://localhost:5000/api/chat/teacher');
+        if (!response.ok) {
+          throw new Error('Failed to get teacher data');
+        }
+        
+        const data = await response.json();
+        if (data.success) {
+          currentTeacher = data.data;
+          return true;
+        } else {
+          console.error('Failed to get teacher details:', data.message);
+          return false;
+        }
+      } catch (error) {
+        console.error('Error getting current teacher:', error);
+        return false;
+      }
+    }
+
+    // Get current user from database
+    async function getCurrentUser() {
+      try {
+        // Kiểm tra localStorage
+        const userData = localStorage.getItem('user');
+        console.log('User data from localStorage:', userData);
+
+        if (!userData) {
+          console.log('No user data found in localStorage');
+          showError('Please login first');
+          return false;
+        }
+
+        let user;
+        try {
+          user = JSON.parse(userData);
+          console.log('Parsed user data:', user);
+        } catch (e) {
+          console.error('Error parsing user data:', e);
+          showError('Invalid user data format');
+          return false;
+        }
+
+        // Kiểm tra cấu trúc dữ liệu user
+        if (!user || (!user.user_id && !user.id)) {
+          console.log('Invalid user data structure:', user);
+          showError('Invalid user data. Please login again');
+          return false;
+        }
+
+        // Chuẩn hóa dữ liệu user
+        const normalizedUser = {
+          user_id: user.user_id || user.id,
+          email: user.email,
+          role: user.role,
+          name: user.name || 'Teacher'
+        };
+
+        // Lấy thông tin giáo viên từ API
+        const response = await fetch('http://localhost:5000/api/chat/teacher');
+        if (!response.ok) {
+          throw new Error('Failed to get teacher data');
+        }
+        
+        const data = await response.json();
+        console.log('Teacher data from API:', data);
+
+        if (data.success) {
+          currentUser = {
+            ...normalizedUser,
+            ...data.data
+          };
+          console.log('Current user set to:', currentUser);
+          return true;
+        } else {
+          showError(data.message || 'Failed to get teacher details');
+          return false;
+        }
+      } catch (error) {
+        console.error('Error getting current user:', error);
+        showError('Error getting user data. Please try again');
+        return false;
+      }
+    }
+
+    // Show error message
+    function showError(message) {
+      console.error('Error:', message); // Debug log
+      const studentList = document.getElementById('studentList');
+      studentList.innerHTML = `
+        <div class="error-container">
+          <p>${message}</p>
+          <button onclick="window.location.href='index.html'">Go to Login</button>
+        </div>
+      `;
+    }
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', async () => {
+      console.log('Page loaded, checking user...'); // Debug log
+      
+      // Get current user
+      const userLoaded = await getCurrentUser();
+      console.log('User loaded:', userLoaded); // Debug log
+      
+      if (userLoaded) {
+        console.log('Fetching students...'); // Debug log
+        // Fetch students when page loads
+        fetchStudents();
+
+        // Add event listeners for forms
+        document.getElementById('addStudentForm').addEventListener('submit', handleAddStudent);
+        document.getElementById('attendanceForm').addEventListener('submit', handleAttendanceSubmit);
+        document.getElementById('gradeForm').addEventListener('submit', handleGradeSubmit);
+      }
+    });
+
+    // Function to handle adding a new student
+    async function handleAddStudent(e) {
+      e.preventDefault();
+      const studentId = document.getElementById('studentId').value;
+      const studentName = document.getElementById('studentName').value;
+      const studentEmail = document.getElementById('studentEmail').value;
+      const studentPhone = document.getElementById('studentPhone').value;
 
       try {
-        const res = await fetch('http://localhost:5000/api/enrollments', {
+        const res = await fetch(`http://localhost:5000/api/course-students/students/${course_id}/enrollments`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            course_id: courseId,
-            student_id: studentId,
+            student_id: parseInt(studentId),
             name: studentName,
             email: studentEmail,
             phone: studentPhone
           })
         });
 
-        const data = await res.json();
-        alert(data.message);
-        if (res.ok) {
-          document.getElementById('studentId').value = '';
-          document.getElementById('studentName').value = '';
-          document.getElementById('studentEmail').value = '';
-          document.getElementById('studentPhone').value = '';
-          fetchStudents();
+        const response = await res.json();
+        if (!response.success) {
+          throw new Error(response.message || 'Failed to add student');
         }
+
+        alert(response.message);
+        document.getElementById('addStudentForm').reset();
+        await fetchStudents();
       } catch (err) {
-        alert("Error adding student");
-      }
-    });
-
-    // Remove student from course
-    async function removeStudent(studentId) {
-      if (!confirm("Are you sure to remove this student from the course?")) return;
-
-      try {
-        const res = await fetch(`http://localhost:5000/api/enrollments`, {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ course_id: courseId, student_id: studentId })
-        });
-
-        const data = await res.json();
-        alert(data.message);
-        if (res.ok) fetchStudents();
-      } catch (err) {
-        alert("Error removing student");
+        alert("Error adding student: " + err.message);
       }
     }
 
-    fetchStudents();
+    // Function to handle attendance submission
+    async function handleAttendanceSubmit(e) {
+      e.preventDefault();
+      const date = document.getElementById('attendanceDate').value;
+      const status = document.getElementById('attendanceStatus').value;
+
+      try {
+        const res = await fetch('http://localhost:5000/api/course-students/attendance', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            student_id: currentStudentId,
+            course_id: course_id,
+            date, 
+            status
+          })
+        });
+
+        const response = await res.json();
+        if (!response.success) {
+          throw new Error(response.message || 'Failed to record attendance');
+        }
+
+        alert(response.message);
+        document.getElementById('attendanceForm').reset();
+        await fetchAttendance(currentStudentId, course_id);
+      } catch (err) {
+        alert("Error recording attendance: " + err.message);
+      }
+    }
+
+    // Function to handle grade submission
+    async function handleGradeSubmit(e) {
+      e.preventDefault();
+      const grade = document.getElementById('gradeScore').value;
+      const comment = document.getElementById('gradeComment').value;
+      const behavior = document.getElementById('gradeBehavior').value;
+
+      try {
+        const res = await fetch('http://localhost:5000/api/course-students/grade', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            student_id: currentStudentId,
+            course_id: course_id,
+            grade: parseFloat(grade), 
+            comment, 
+            behavior
+          })
+        });
+
+        const response = await res.json();
+        if (!response.success) {
+          throw new Error(response.message || 'Failed to record grade');
+        }
+
+        alert(response.message);
+        document.getElementById('gradeForm').reset();
+        await fetchGrades(currentStudentId, course_id);
+      } catch (err) {
+        alert("Error recording grade: " + err.message);
+      }
+    }
+
+    // Function to handle removing a student
+    async function removeStudent(studentId, courseId) {
+      if (!confirm("Are you sure you want to remove this student from the course?")) {
+        return;
+      }
+
+      try {
+        const res = await fetch(`http://localhost:5000/api/course-students/students/${courseId}/enrollments/${studentId}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' }
+        });
+
+        const response = await res.json();
+        if (!response.success) {
+          throw new Error(response.message || 'Failed to remove student');
+        }
+
+        alert(response.message);
+        await fetchStudents();
+      } catch (err) {
+        alert("Error removing student: " + err.message);
+      }
+    }
+
+    // Function to open attendance modal
+    async function openAttendance(studentId, courseId) {
+      currentStudentId = studentId;
+      document.getElementById('attendanceModal').style.display = 'block';
+      await fetchAttendance(studentId, courseId);
+    }
+
+    // Function to open grade modal
+    async function openGrade(studentId, courseId) {
+      currentStudentId = studentId;
+      document.getElementById('gradeModal').style.display = 'block';
+      await fetchGrades(studentId, courseId);
+    }
+
+    // Function to open chat modal
+    function openChat(studentId) {
+      if (!currentUser) {
+        showError('Please login to chat');
+        return;
+      }
+      currentStudentId = studentId;
+      const modal = document.getElementById('chatModal');
+      modal.style.display = 'block';
+      loadMessages();
+    }
+
+    // Function to close modal
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+      if (modalId === 'chatModal') {
+        currentStudentId = null;
+      }
+    }
+
+    // Function to fetch students
+    async function fetchStudents() {
+      try {
+        const res = await fetch(`http://localhost:5000/api/course-students/students/${course_id}`);
+        
+        if (!res.ok) {
+          const errorData = await res.json();
+          if (res.status === 404) {
+            alert('Course not found. Please select a valid course.');
+            window.location.href = 'courses.html';
+            return;
+          }
+          throw new Error(errorData.message || `HTTP error! status: ${res.status}`);
+        }
+
+        const response = await res.json();
+        if (!response.success) {
+          throw new Error(response.message || 'Failed to fetch students');
+        }
+
+        const data = response.data;
+        if (!Array.isArray(data)) {
+          throw new Error('Invalid data format received from server');
+        }
+
+        if (data.length === 0) {
+          document.getElementById('studentList').innerHTML = `
+            <div class="no-students">
+              <p>No students found for this course.</p>
+            </div>
+          `;
+          return;
+        }
+
+        const list = data.map(s => `
+          <div class="container">
+            <h3>${s.name || 'No Name'}</h3>
+            <p>ID: ${s.student_id || 'N/A'}</p>
+            <p>Email: ${s.email || 'N/A'}</p>
+            <p>Phone: ${s.phone || 'N/A'}</p>
+            <div class="button-group">
+              <button onclick="openAttendance('${s.student_id}', '${course_id}')">Attendance</button>
+              <button onclick="openGrade('${s.student_id}', '${course_id}')">Grade</button>
+              <button onclick="openChat('${s.student_id}')">Chat</button>
+              <button onclick="removeStudent('${s.student_id}', '${course_id}')">Remove</button>
+            </div>
+          </div>
+        `).join('');
+
+        document.getElementById('studentList').innerHTML = list;
+      } catch (err) {
+        document.getElementById('studentList').innerHTML = `
+          <div class="error-message">
+            <p>Error loading students: ${err.message}</p>
+            <p>Please try again later</p>
+          </div>
+        `;
+      }
+    }
+
+    // Function to fetch attendance records
+    async function fetchAttendance(studentId, courseId) {
+      try {
+        const res = await fetch(`http://localhost:5000/api/course-students/students/${courseId}/attendance/${studentId}`);
+        const response = await res.json();
+        
+        if (!response.success) {
+          throw new Error(response.message || 'Failed to fetch attendance');
+        }
+
+        const data = response.data;
+        const attendanceList = document.getElementById('attendanceList');
+        
+        if (data.length === 0) {
+          attendanceList.innerHTML = '<p class="no-records">No attendance records found</p>';
+          return;
+        }
+
+        attendanceList.innerHTML = `
+          <h4>Attendance History</h4>
+          ${data.map(record => `
+            <div class="record-item">
+              <p><strong>Date:</strong> ${record.date}</p>
+              <p><strong>Status:</strong> ${record.status}</p>
+            </div>
+          `).join('')}
+        `;
+      } catch (err) {
+        document.getElementById('attendanceList').innerHTML = `
+          <div class="error-message">
+            <p>Error loading attendance records: ${err.message}</p>
+          </div>
+        `;
+      }
+    }
+
+    // Function to fetch grade records
+    async function fetchGrades(studentId, courseId) {
+      try {
+        const res = await fetch(`http://localhost:5000/api/course-students/students/${courseId}/grades/${studentId}`);
+        const response = await res.json();
+        
+        if (!response.success) {
+          throw new Error(response.message || 'Failed to fetch grades');
+        }
+
+        const data = response.data;
+        const gradeList = document.getElementById('gradeList');
+        
+        if (data.length === 0) {
+          gradeList.innerHTML = '<p class="no-records">No grade records found</p>';
+          return;
+        }
+
+        gradeList.innerHTML = `
+          <h4>Grade History</h4>
+          ${data.map(record => `
+            <div class="record-item">
+              <p><strong>Grade:</strong> ${record.grade}</p>
+              <p><strong>Comment:</strong> ${record.comment || 'No comment'}</p>
+              <p><strong>Behavior:</strong> ${record.behavior || 'Not recorded'}</p>
+              <p><strong>Updated:</strong> ${record.updated_at}</p>
+            </div>
+          `).join('')}
+        `;
+      } catch (err) {
+        document.getElementById('gradeList').innerHTML = `
+          <div class="error-message">
+            <p>Error loading grade records: ${err.message}</p>
+          </div>
+        `;
+      }
+    }
+
+    // Load messages
+    async function loadMessages() {
+      if (!currentStudentId || !course_id || !currentUser) {
+        showError('Please login to view messages');
+        return;
+      }
+
+      try {
+        const url = `http://localhost:5000/api/chat/private/${currentStudentId}?course_id=${course_id}&sender_id=${currentUser.user_id}`;
+        console.log('Loading messages from:', url);
+
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Server error response:', errorData);
+          throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Messages data:', data);
+
+        if (data.success) {
+          displayMessages(data.data);
+        } else {
+          showError(data.message || 'Failed to load messages');
+        }
+      } catch (error) {
+        console.error('Error loading messages:', error);
+        showError('Error loading messages. Please try again');
+      }
+    }
+
+    // Display messages
+    function displayMessages(messages) {
+      const chatMessages = document.getElementById('chatMessages');
+      chatMessages.innerHTML = '';
+
+      messages.forEach(msg => {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${msg.sender_id === currentUser.user_id ? 'sent' : 'received'}`;
+        messageDiv.innerHTML = `
+          <strong>${msg.sender_name}:</strong> ${msg.message}
+          <small>${new Date(msg.created_at).toLocaleString()}</small>
+        `;
+        chatMessages.appendChild(messageDiv);
+      });
+
+      // Scroll to bottom
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Send message
+    async function sendMessage() {
+      if (!currentStudentId || !course_id || !currentUser) {
+        showError('Please login to send messages');
+        return;
+      }
+
+      const messageInput = document.getElementById('messageInput');
+      const message = messageInput.value.trim();
+
+      if (!message) {
+        showError('Please enter a message');
+        return;
+      }
+
+      // Validate required fields
+      if (!currentUser.user_id) {
+        showError('Invalid user ID. Please login again');
+        return;
+      }
+
+      if (!course_id) {
+        showError('Course ID is missing');
+        return;
+      }
+
+      try {
+        // Prepare request data
+        const requestData = {
+          message: message,
+          course_id: course_id,
+          sender_id: currentUser.user_id,
+          sender_name: currentUser.name || 'Teacher'
+        };
+
+        // Log request data for debugging
+        console.log('Current User:', currentUser);
+        console.log('Request Data:', requestData);
+
+        const response = await fetch(`http://localhost:5000/api/chat/private/${currentStudentId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(requestData)
+        });
+
+        const responseData = await response.json();
+        console.log('Server Response:', responseData);
+
+        if (!response.ok) {
+          throw new Error(responseData.message || `HTTP error! status: ${response.status}`);
+        }
+
+        if (responseData.success) {
+          messageInput.value = '';
+          loadMessages(); // Reload messages
+        } else {
+          showError(responseData.message || 'Failed to send message');
+        }
+      } catch (error) {
+        console.error('Error sending message:', error);
+        showError(error.message || 'Error sending message. Please try again');
+      }
+    }
+
+    // Event listeners
+    document.querySelector('.close').addEventListener('click', closeChat);
+    window.addEventListener('click', (event) => {
+      const modal = document.getElementById('chatModal');
+      if (event.target === modal) {
+        closeChat();
+      }
+    });
   </script>
 </body>
 </html>

@@ -2,18 +2,342 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Chat</title>
-  <link rel="stylesheet" href="css/style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher - Student Chat</title>
+  <link rel="icon" href="data:,"> <!-- Prevent favicon.ico request -->
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .chat-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .chat-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .search-container {
+      margin-bottom: 20px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .search-container input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    .search-container button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .user-list {
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
+
+    .user-item {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .user-item:hover {
+      background-color: #f5f5f5;
+    }
+
+    .user-item.active {
+      background-color: #e3f2fd;
+    }
+
+    .user-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .user-name {
+      font-weight: bold;
+    }
+
+    .user-email {
+      font-size: 0.9em;
+      color: #666;
+    }
+
+    .chat-messages {
+      height: 400px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-bottom: 20px;
+      background-color: #f9f9f9;
+    }
+
+    .message {
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 5px;
+      background-color: #fff;
+    }
+
+    .message.sent {
+      background-color: #e3f2fd;
+      margin-left: 50%;
+    }
+
+    .message.received {
+      background-color: #f1f1f1;
+      margin-right: 50%;
+    }
+
+    .message-header {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .message-time {
+      font-size: 0.8em;
+      color: #666;
+    }
+
+    .chat-input {
+      display: flex;
+      gap: 10px;
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    .chat-input button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .chat-input button:hover {
+      background-color: #45a049;
+    }
+
+    .message-box {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+    }
+
+    .success { background-color: #d4edda; color: #155724; }
+    .error { background-color: #f8d7da; color: #721c24; }
+  </style>
 </head>
 <body>
-  <h1>Chat</h1>
-  <button onclick="location.href='dashboard.html'">Back</button>
-  <ul id="chatBox"></ul>
-  <form id="chatForm">
-    <input type="text" id="to" placeholder="To username" required>
-    <input type="text" id="message" placeholder="Message" required>
-    <button type="submit">Send</button>
-  </form>
-  <script src="js/chat.js"></script>
+  <nav>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="courses.html">Courses</a>
+    <a href="index.html" id="logout">Logout</a>
+  </nav>
+
+  <div class="chat-container">
+    <div class="chat-header">
+      <h2>Teacher - Student Chat</h2>
+    </div>
+
+    <div id="messageBox"></div>
+
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Search students by name or email...">
+      <button onclick="searchStudents()">Search</button>
+    </div>
+
+    <div class="user-list" id="userList">
+      <!-- Student list will be loaded here -->
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+      <!-- Messages will be loaded here -->
+    </div>
+
+    <div class="chat-input">
+      <input type="text" id="messageInput" placeholder="Type your message...">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    let currentUser = null;
+    let currentCourseId = null;
+
+    // Hàm kiểm tra đăng nhập
+    function checkLogin() {
+      const user = localStorage.getItem('user');
+      const token = localStorage.getItem('token');
+      
+      if (!user || !token) {
+        console.log('No user or token found');
+        window.location.href = 'index.html';
+        return false;
+      }
+      
+      try {
+        const userData = JSON.parse(user);
+        if (!userData || !userData.id) {
+          console.log('Invalid user data');
+          window.location.href = 'index.html';
+          return false;
+        }
+        currentUser = userData;
+        return true;
+      } catch (err) {
+        console.error('Error parsing user data:', err);
+        window.location.href = 'index.html';
+        return false;
+      }
+    }
+
+    // Load user info from localStorage
+    document.addEventListener('DOMContentLoaded', () => {
+      // Kiểm tra và lưu dữ liệu user
+      if (!checkLogin()) {
+        console.log('User not logged in, redirecting to login page');
+        localStorage.removeItem('userData');
+        localStorage.removeItem('token');
+        window.location.href = 'index.html';
+        return;
+      }
+
+      // Lấy course_id từ URL
+      const urlParams = new URLSearchParams(window.location.search);
+      currentCourseId = urlParams.get('course_id');
+
+      if (!currentCourseId) {
+        showMessage('Course ID is required', false);
+        return;
+      }
+
+      // Load messages
+      loadMessages();
+
+      // Add logout functionality
+      document.getElementById('logout').addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        window.location.href = 'index.html';
+      });
+    });
+
+    // Load messages
+    async function loadMessages() {
+      if (!currentCourseId) return;
+
+      try {
+        const response = await fetch(`http://localhost:5000/api/chat/course/${currentCourseId}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (data.success) {
+          displayMessages(data.data);
+        }
+      } catch (error) {
+        console.error('Error loading messages:', error);
+        showMessage('Error loading messages: ' + error.message, false);
+      }
+    }
+
+    // Display messages
+    function displayMessages(messages) {
+      const chatMessages = document.getElementById('chatMessages');
+      chatMessages.innerHTML = '';
+
+      messages.forEach(msg => {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${msg.sender_id === currentUser.id ? 'sent' : 'received'}`;
+        messageDiv.innerHTML = `
+          <div class="message-header">${msg.sender_name}</div>
+          <div class="message-content">${msg.message}</div>
+          <div class="message-time">${new Date(msg.created_at).toLocaleString()}</div>
+        `;
+        chatMessages.appendChild(messageDiv);
+      });
+
+      // Scroll to bottom
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Send message
+    async function sendMessage() {
+      if (!currentCourseId) return;
+
+      const messageInput = document.getElementById('messageInput');
+      const message = messageInput.value.trim();
+
+      if (!message) return;
+
+      try {
+        const response = await fetch(`http://localhost:5000/api/chat/course/${currentCourseId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message: message,
+            course_id: currentCourseId,
+            sender_id: currentUser.id,
+            sender_name: currentUser.name
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (data.success) {
+          messageInput.value = '';
+          loadMessages(); // Reload messages
+        } else {
+          throw new Error(data.message || 'Failed to send message');
+        }
+      } catch (error) {
+        console.error('Error sending message:', error);
+        showMessage('Error sending message: ' + error.message, false);
+      }
+    }
+
+    // Show message
+    function showMessage(message, isSuccess) {
+      const messageBox = document.getElementById('messageBox');
+      messageBox.innerHTML = `
+        <div class="message-box ${isSuccess ? 'success' : 'error'}">
+          ${message}
+        </div>
+      `;
+      setTimeout(() => {
+        messageBox.innerHTML = '';
+      }, 3000);
+    }
+  </script>
 </body>
 </html>

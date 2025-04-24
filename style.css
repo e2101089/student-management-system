@@ -60,3 +60,47 @@ button:hover {
     border: 1px solid #bce8f1;
     border-radius: 4px;
 }
+
+.courses-container {
+    display: flex;
+    gap: 2rem;
+    padding: 1rem;
+}
+
+#myCourses, #availableCourses {
+    flex: 1;
+    padding: 1rem;
+    background: #f5f5f5;
+    border-radius: 8px;
+}
+
+.course-card {
+    background: white;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.course-card h3 {
+    margin: 0 0 0.5rem 0;
+    color: #333;
+}
+
+.course-card p {
+    margin: 0 0 1rem 0;
+    color: #666;
+}
+
+.course-card button {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.course-card button:hover {
+    background: #45a049;
+}
