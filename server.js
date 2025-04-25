@@ -3,14 +3,6 @@ const cors = require('cors');
 const app = express();
 const db = require('./db');
 const bodyParser = require('body-parser');
-const auth = require('./auth');
-
-// Import routes
-const studentController = require('./studentController');
-const courseController = require('./courses');
-const courseStudentController = require('./courseStudentController');
-const authController = require('./auth');
-const chatRoutes = require('./chat');
 
 // CORS configuration
 app.use(cors());
@@ -19,12 +11,17 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Import routes
+const studentController = require('./studentController');
+const courseController = require('./courses');
+const courseStudentController = require('./courseStudentController');
+const authController = require('./auth');
+
 // Use routes
 app.use('/api/students', studentController);
 app.use('/api/courses', courseController);
 app.use('/api/course-students', courseStudentController);
-app.use('/api/auth', authController);
-app.use('/api/chat', chatRoutes);
+app.use('/api', authController);
 
 // Test database connection
 app.get('/api/test-db', async (req, res) => {

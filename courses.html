@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Manage Courses</title>
   <link rel="stylesheet" href="style.css">
   <style>
@@ -14,67 +13,8 @@
     .success { background-color: #d4edda; color: #155724; }
     .error { background-color: #f8d7da; color: #721c24; }
     ul { list-style: none; padding: 0; }
-    li { margin: 8px 0; display: flex; align-items: center; gap: 10px; }
+    li { margin: 8px 0; }
     button { margin-left: 10px; }
-
-    /* Chat popup styles */
-    .chat-popup {
-      display: none;
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 300px;
-      height: 400px;
-      background: white;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      z-index: 1000;
-    }
-
-    .chat-header {
-      padding: 10px;
-      background: #4CAF50;
-      color: white;
-      border-radius: 5px 5px 0 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .chat-messages {
-      height: 300px;
-      overflow-y: auto;
-      padding: 10px;
-    }
-
-    .chat-input {
-      padding: 10px;
-      border-top: 1px solid #ddd;
-      display: flex;
-      gap: 10px;
-    }
-
-    .chat-input input {
-      flex: 1;
-      padding: 5px;
-      border: 1px solid #ddd;
-      border-radius: 3px;
-    }
-
-    .chat-input button {
-      padding: 5px 10px;
-      background: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 3px;
-      cursor: pointer;
-    }
-
-    .close-chat {
-      cursor: pointer;
-      font-size: 20px;
-    }
 
     /* Thêm style cho thanh menu */
     nav {
@@ -92,113 +32,6 @@
 
     nav a:hover {
       color: #ddd;
-    }
-
-    .chat-button {
-      background: #4CAF50;
-      padding: 5px 10px;
-      border-radius: 3px;
-    }
-
-    /* Student management styles */
-    .student-management {
-      margin-top: 20px;
-      padding: 15px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      background-color: #f9f9f9;
-    }
-
-    .student-list {
-      margin-top: 15px;
-    }
-
-    .student-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      margin-bottom: 10px;
-      background-color: white;
-    }
-
-    .student-info {
-      flex: 1;
-    }
-
-    .student-actions {
-      display: flex;
-      gap: 10px;
-    }
-
-    .student-actions button {
-      padding: 5px 10px;
-      border: none;
-      border-radius: 3px;
-      cursor: pointer;
-    }
-
-    .attendance-btn {
-      background-color: #4CAF50;
-      color: white;
-    }
-
-    .grade-btn {
-      background-color: #2196F3;
-      color: white;
-    }
-
-    .remove-btn {
-      background-color: #f44336;
-      color: white;
-    }
-
-    /* Modal styles */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.5);
-      z-index: 1000;
-    }
-
-    .modal-content {
-      position: relative;
-      background-color: #fff;
-      margin: 2% auto;
-      padding: 20px;
-      width: 80%;
-      max-width: 600px;
-      border-radius: 5px;
-    }
-
-    .close {
-      position: absolute;
-      right: 10px;
-      top: 5px;
-      font-size: 24px;
-      cursor: pointer;
-    }
-
-    .form-group {
-      margin-bottom: 15px;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 5px;
-    }
-
-    .form-group input {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
     }
   </style>
 </head>
@@ -233,120 +66,17 @@
     <!-- Danh sách khóa học sẽ được hiển thị ở đây -->
   </ul>
 
-  <!-- Student Management Section -->
-  <div id="studentManagement" class="student-management" style="display: none;">
-    <h3>Student Management</h3>
-    <div class="student-actions">
-      <button onclick="showAddStudentModal()">Add Student</button>
-    </div>
-    <div id="studentList" class="student-list">
-      <!-- Danh sách học sinh sẽ được hiển thị ở đây -->
-    </div>
-  </div>
-
-  <!-- Add Student Modal -->
-  <div id="addStudentModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeAddStudentModal()">&times;</span>
-      <h3>Add Student</h3>
-      <form id="addStudentForm">
-        <div class="form-group">
-          <label for="studentName">Name</label>
-          <input type="text" id="studentName" required>
-        </div>
-        <div class="form-group">
-          <label for="studentEmail">Email</label>
-          <input type="email" id="studentEmail" required>
-        </div>
-        <div class="form-group">
-          <label for="studentPhone">Phone</label>
-          <input type="tel" id="studentPhone" required>
-        </div>
-        <button type="submit">Add Student</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Attendance Modal -->
-  <div id="attendanceModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeAttendanceModal()">&times;</span>
-      <h3>Attendance Record</h3>
-      <div id="attendanceList">
-        <!-- Danh sách điểm danh sẽ được hiển thị ở đây -->
-      </div>
-      <button onclick="markAttendance()">Mark Attendance</button>
-    </div>
-  </div>
-
-  <!-- Grade Modal -->
-  <div id="gradeModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeGradeModal()">&times;</span>
-      <h3>Grade Management</h3>
-      <form id="gradeForm">
-        <div class="form-group">
-          <label for="grade">Grade</label>
-          <input type="number" id="grade" min="0" max="10" step="0.1" required>
-        </div>
-        <button type="submit">Save Grade</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Chat Popup -->
-  <div id="chatPopup" class="chat-popup">
-    <div class="chat-header">
-      <span id="chatTitle">Chat with Students</span>
-      <span class="close-chat" onclick="closeChat()">×</span>
-    </div>
-    <div id="chatMessages" class="chat-messages"></div>
-    <div class="chat-input">
-      <input type="text" id="messageInput" placeholder="Type your message...">
-      <button onclick="sendMessage()">Send</button>
-    </div>
-  </div>
-
   <script>
-    let currentCourseId = null;
-    let currentTeacher = null;
-    let currentStudentId = null;
+    const teacherId = 1; // giả định tạm
 
-    // Get current teacher from database
-    async function getCurrentTeacher() {
-      try {
-        const response = await fetch('http://localhost:5000/api/chat/teacher');
-        if (!response.ok) {
-          throw new Error('Failed to get teacher data');
-        }
-        
-        const data = await response.json();
-        if (data.success) {
-          currentTeacher = data.data;
-          return true;
-        } else {
-          console.error('Failed to get teacher details:', data.message);
-          return false;
-        }
-      } catch (error) {
-        console.error('Error getting current teacher:', error);
-        return false;
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', async () => {
-      const teacherLoaded = await getCurrentTeacher();
-      if (teacherLoaded) {
-        loadCourses();
-      }
-    });
+    document.addEventListener('DOMContentLoaded', loadCourses);
 
     // Xử lý thêm khóa học
     document.getElementById('addCourseForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const name = document.getElementById('addCourseName').value.trim();
       const course_id = document.getElementById('addCourseId').value.trim();
-      if (!name || !course_id) return showMessage('Course name and ID are required', false);
+      if (!name) return showMessage('Course name is required', false);
 
       try {
         const res = await fetch('http://localhost:5000/api/courses', {
@@ -359,7 +89,6 @@
         if (res.ok) {
           showMessage(result.message || 'Course added successfully', true);
           document.getElementById('addCourseName').value = '';
-          document.getElementById('addCourseId').value = '';
           loadCourses();
         } else {
           showMessage(result.message || 'Failed to add course', false);
@@ -369,23 +98,37 @@
       }
     });
 
-    // Xử lý xóa khóa học
+    // Xử lý xóa khóa học theo tên
     document.getElementById('deleteCourseForm').addEventListener('submit', async (e) => {
       e.preventDefault();
+
       const name = document.getElementById('deleteCourseName').value.trim();
       const course_id = document.getElementById('deleteCourseId').value.trim();
 
       if (!course_id || !name) return showMessage('Please enter course name and ID to delete', false);
 
       try {
-        const res = await fetch('http://localhost:5000/api/courses', {
+        const res = await fetch('http://localhost:5000/api/courses');
+        const courses = await res.json();
+
+        const courseToDelete = courses.find(course =>
+          course.name.toLowerCase() === name.toLowerCase() &&
+          course.course_id == course_id
+        );
+
+        if (!courseToDelete) {
+          return showMessage('Course not found', false);
+        }
+
+        const deleteRes = await fetch('http://localhost:5000/api/courses', {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, course_id })
         });
 
-        const result = await res.json();
-        if (res.ok) {
+        const result = await deleteRes.json();
+
+        if (deleteRes.ok) {
           showMessage(result.message || 'Course deleted successfully', true);
           document.getElementById('deleteCourseForm').reset();
           loadCourses();
@@ -402,34 +145,24 @@
     async function loadCourses() {
       try {
         const res = await fetch('http://localhost:5000/api/courses');
-        const courses = await res.json();
+        const courses = await res.json();  // Lấy dữ liệu từ backend
 
         const courseList = document.getElementById('courseList');
-        courseList.innerHTML = '';
+        courseList.innerHTML = '';  // Xóa danh sách khóa học cũ
 
+        // Kiểm tra và hiển thị các khóa học
         if (courses.length === 0) {
           courseList.innerHTML = '<li>No courses found</li>';
           return;
         }
 
+        // Hiển thị khóa học và tạo liên kết đến trang sinh viên
         courses.forEach(course => {
           const li = document.createElement('li');
-          
           const link = document.createElement('a');
-          link.href = `student_list.html?course_id=${course.course_id}`;
+          link.href = `student_list.html?course_id=${course.course_id}`;  // Changed from courseId to course_id
           link.textContent = `${course.name} (Course ID: ${course.course_id})`;
-          
-          const manageBtn = document.createElement('button');
-          manageBtn.textContent = 'Manage Students';
-          manageBtn.onclick = () => showStudentManagement(course.course_id);
-          
-          const chatBtn = document.createElement('button');
-          chatBtn.textContent = 'Chat';
-          chatBtn.onclick = () => openChat(course.course_id, course.name);
-          
           li.appendChild(link);
-          li.appendChild(manageBtn);
-          li.appendChild(chatBtn);
           courseList.appendChild(li);
         });
       } catch (err) {
@@ -438,336 +171,10 @@
       }
     }
 
-    // Chat functions
-    function openChat(courseId, courseName) {
-      currentCourseId = courseId;
-      document.getElementById('chatTitle').textContent = `Chat - ${courseName}`;
-      document.getElementById('chatPopup').style.display = 'block';
-      loadMessages();
-    }
-
-    function closeChat() {
-      document.getElementById('chatPopup').style.display = 'none';
-      currentCourseId = null;
-    }
-
-    async function loadMessages() {
-      if (!currentCourseId || !currentTeacher) return;
-
-      try {
-        const response = await fetch(`http://localhost:5000/api/chat/course/${currentCourseId}`);
-        const data = await response.json();
-
-        if (data.success) {
-          displayMessages(data.data);
-        }
-      } catch (error) {
-        console.error('Error loading messages:', error);
-      }
-    }
-
-    function displayMessages(messages) {
-      const chatMessages = document.getElementById('chatMessages');
-      chatMessages.innerHTML = '';
-
-      messages.forEach(msg => {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${msg.sender_id === currentTeacher.user_id ? 'sent' : 'received'}`;
-        messageDiv.innerHTML = `
-          <strong>${msg.sender_name}:</strong> ${msg.message}
-          <small>${new Date(msg.created_at).toLocaleString()}</small>
-        `;
-        chatMessages.appendChild(messageDiv);
-      });
-
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    async function sendMessage() {
-      if (!currentCourseId || !currentTeacher) return;
-
-      const messageInput = document.getElementById('messageInput');
-      const message = messageInput.value.trim();
-
-      if (!message) return;
-
-      try {
-        const response = await fetch(`http://localhost:5000/api/chat/course/${currentCourseId}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            message: message,
-            sender_id: currentTeacher.user_id,
-            sender_name: currentTeacher.name || 'Teacher'
-          })
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-          messageInput.value = '';
-          loadMessages();
-        }
-      } catch (error) {
-        console.error('Error sending message:', error);
-      }
-    }
-
-    function showMessage(message, isSuccess) {
-      const messageBox = document.getElementById('messageBox');
-      messageBox.innerHTML = `<div class="message ${isSuccess ? 'success' : 'error'}">${message}</div>`;
-      setTimeout(() => messageBox.innerHTML = '', 3000);
-    }
-
-    // Student Management Functions
-    function showStudentManagement(courseId) {
-      currentCourseId = courseId;
-      document.getElementById('studentManagement').style.display = 'block';
-      loadStudents();
-    }
-
-    function hideStudentManagement() {
-      document.getElementById('studentManagement').style.display = 'none';
-      currentCourseId = null;
-    }
-
-    async function loadStudents() {
-      if (!currentCourseId) return;
-
-      try {
-        const response = await fetch(`http://localhost:5000/api/course-students/students/${currentCourseId}`);
-        if (!response.ok) {
-          throw new Error('Failed to load students');
-        }
-        
-        const data = await response.json();
-        const studentList = document.getElementById('studentList');
-        studentList.innerHTML = '';
-
-        if (data.success && data.data.length > 0) {
-          data.data.forEach(student => {
-            const studentDiv = document.createElement('div');
-            studentDiv.className = 'student-item';
-            studentDiv.innerHTML = `
-              <div class="student-info">
-                <h4>${student.name}</h4>
-                <p>Email: ${student.email}</p>
-                <p>Phone: ${student.phone}</p>
-              </div>
-              <div class="student-actions">
-                <button class="attendance-btn" onclick="showAttendanceModal(${student.student_id})">Attendance</button>
-                <button class="grade-btn" onclick="showGradeModal(${student.student_id})">Grade</button>
-                <button class="remove-btn" onclick="removeStudent(${student.student_id})">Remove</button>
-              </div>
-            `;
-            studentList.appendChild(studentDiv);
-          });
-        } else {
-          studentList.innerHTML = '<p>No students found in this course</p>';
-        }
-      } catch (error) {
-        console.error('Error loading students:', error);
-        showMessage('Error loading students', false);
-      }
-    }
-
-    // Add Student Functions
-    function showAddStudentModal() {
-      document.getElementById('addStudentModal').style.display = 'block';
-    }
-
-    function closeAddStudentModal() {
-      document.getElementById('addStudentModal').style.display = 'none';
-    }
-
-    document.getElementById('addStudentForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const name = document.getElementById('studentName').value;
-      const email = document.getElementById('studentEmail').value;
-      const phone = document.getElementById('studentPhone').value;
-
-      try {
-        const response = await fetch('http://localhost:5000/api/students', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            name,
-            email,
-            phone,
-            course_id: currentCourseId
-          })
-        });
-
-        const data = await response.json();
-        if (data.success) {
-          closeAddStudentModal();
-          loadStudents();
-          showMessage('Student added successfully', true);
-        } else {
-          showMessage(data.message || 'Failed to add student', false);
-        }
-      } catch (error) {
-        console.error('Error adding student:', error);
-        showMessage('Error adding student', false);
-      }
-    });
-
-    // Attendance Functions
-    function showAttendanceModal(studentId) {
-      currentStudentId = studentId;
-      document.getElementById('attendanceModal').style.display = 'block';
-      loadAttendance();
-    }
-
-    function closeAttendanceModal() {
-      document.getElementById('attendanceModal').style.display = 'none';
-      currentStudentId = null;
-    }
-
-    async function loadAttendance() {
-      if (!currentStudentId || !currentCourseId) return;
-
-      try {
-        const response = await fetch(`http://localhost:5000/api/attendance/${currentStudentId}?course_id=${currentCourseId}`);
-        const data = await response.json();
-        
-        const attendanceList = document.getElementById('attendanceList');
-        attendanceList.innerHTML = '';
-
-        if (data.success && data.data.length > 0) {
-          data.data.forEach(record => {
-            const recordDiv = document.createElement('div');
-            recordDiv.className = 'attendance-record';
-            recordDiv.innerHTML = `
-              <p>Date: ${new Date(record.date).toLocaleDateString()}</p>
-              <p>Status: ${record.status}</p>
-            `;
-            attendanceList.appendChild(recordDiv);
-          });
-        } else {
-          attendanceList.innerHTML = '<p>No attendance records found</p>';
-        }
-      } catch (error) {
-        console.error('Error loading attendance:', error);
-        showMessage('Error loading attendance records', false);
-      }
-    }
-
-    async function markAttendance() {
-      if (!currentStudentId || !currentCourseId) return;
-
-      try {
-        const response = await fetch(`http://localhost:5000/api/attendance/${currentStudentId}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            course_id: currentCourseId,
-            status: 'Present'
-          })
-        });
-
-        const data = await response.json();
-        if (data.success) {
-          loadAttendance();
-          showMessage('Attendance marked successfully', true);
-        } else {
-          showMessage(data.message || 'Failed to mark attendance', false);
-        }
-      } catch (error) {
-        console.error('Error marking attendance:', error);
-        showMessage('Error marking attendance', false);
-      }
-    }
-
-    // Grade Functions
-    function showGradeModal(studentId) {
-      currentStudentId = studentId;
-      document.getElementById('gradeModal').style.display = 'block';
-      loadGrade();
-    }
-
-    function closeGradeModal() {
-      document.getElementById('gradeModal').style.display = 'none';
-      currentStudentId = null;
-    }
-
-    async function loadGrade() {
-      if (!currentStudentId || !currentCourseId) return;
-
-      try {
-        const response = await fetch(`http://localhost:5000/api/grades/${currentStudentId}?course_id=${currentCourseId}`);
-        const data = await response.json();
-        
-        if (data.success && data.data) {
-          document.getElementById('grade').value = data.data.grade || '';
-        }
-      } catch (error) {
-        console.error('Error loading grade:', error);
-        showMessage('Error loading grade', false);
-      }
-    }
-
-    document.getElementById('gradeForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const grade = document.getElementById('grade').value;
-
-      try {
-        const response = await fetch(`http://localhost:5000/api/grades/${currentStudentId}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            course_id: currentCourseId,
-            grade: parseFloat(grade)
-          })
-        });
-
-        const data = await response.json();
-        if (data.success) {
-          closeGradeModal();
-          showMessage('Grade saved successfully', true);
-        } else {
-          showMessage(data.message || 'Failed to save grade', false);
-        }
-      } catch (error) {
-        console.error('Error saving grade:', error);
-        showMessage('Error saving grade', false);
-      }
-    });
-
-    // Remove Student Function
-    async function removeStudent(studentId) {
-      if (!confirm('Are you sure you want to remove this student from the course?')) return;
-
-      try {
-        const response = await fetch(`http://localhost:5000/api/course-students/${studentId}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            course_id: currentCourseId
-          })
-        });
-
-        const data = await response.json();
-        if (data.success) {
-          loadStudents();
-          showMessage('Student removed successfully', true);
-        } else {
-          showMessage(data.message || 'Failed to remove student', false);
-        }
-      } catch (error) {
-        console.error('Error removing student:', error);
-        showMessage('Error removing student', false);
-      }
+    function showMessage(msg, success = true) {
+      const box = document.getElementById('messageBox');
+      box.innerHTML = `<div class="message ${success ? 'success' : 'error'}">${msg}</div>`;
+      setTimeout(() => box.innerHTML = '', 3000);
     }
   </script>
 </body>

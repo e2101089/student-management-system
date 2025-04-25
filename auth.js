@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('./db');
-const jwt = require('jsonwebtoken');
+
 // Register route
 // Register route
 router.post('/register', async (req, res) => {
@@ -46,13 +46,12 @@ router.post('/register', async (req, res) => {
 
 
 // Login route
-// Login route
 router.post('/login', async (req, res) => {
     console.log('=== Login Request ===');
     console.log('Request body:', req.body);
-
+    
     const { email, password } = req.body;
-
+    
     if (!email || !password) {
         console.log('Missing credentials');
         return res.status(400).json({ 
@@ -108,8 +107,7 @@ router.post('/login', async (req, res) => {
         console.error('Login error:', error);
         res.status(500).json({ 
             success: false, 
-            message: 'An error occurred during login',
-            error: error.message // Log thêm chi tiết lỗi
+            message: 'An error occurred during login' 
         });
     }
 });
