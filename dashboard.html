@@ -5,6 +5,60 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    .notification-section {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .notification-item {
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .notification-item:last-child {
+      border-bottom: none;
+    }
+
+    .notification-item.unread {
+      background-color: #f0f7ff;
+    }
+
+    .notification-message {
+      flex-grow: 1;
+      color: #333;
+    }
+
+    .notification-time {
+      color: #666;
+      font-size: 0.9em;
+      margin-left: 15px;
+    }
+
+    .mark-read-btn {
+      background: none;
+      border: none;
+      color: #007bff;
+      cursor: pointer;
+      padding: 5px 10px;
+    }
+
+    .mark-read-btn:hover {
+      text-decoration: underline;
+    }
+
+    .no-notifications {
+      text-align: center;
+      color: #666;
+      padding: 20px;
+    }
+  </style>
 </head>
 <body>
   <h1>Welcome to Dashboard</h1>
@@ -14,11 +68,32 @@
     <button onclick="logout()">Logout</button>
   </nav>
 
-  <section id="notifications">
+  <section class="notification-section">
     <h2>Notifications</h2>
-    <ul id="notificationList"></ul>
+    <div id="notificationList">
+      <!-- School notifications -->
+      <div class="notification-item">
+        <div class="notification-message">School Announcement: Mid-term exam schedule has been updated</div>
+        <div class="notification-time">10:30 AM</div>
+      </div>
+      <div class="notification-item">
+        <div class="notification-message">Important: New academic calendar for Spring semester 2024</div>
+        <div class="notification-time">09:15 AM</div>
+      </div>
+      <div class="notification-item">
+        <div class="notification-message">Reminder: Student ID card renewal deadline is approaching</div>
+        <div class="notification-time">Yesterday</div>
+      </div>
+      <div class="notification-item">
+        <div class="notification-message">Library Notice: Extended opening hours during exam period</div>
+        <div class="notification-time">Yesterday</div>
+      </div>
+      <div class="notification-item">
+        <div class="notification-message">Campus Update: New computer lab facilities available</div>
+        <div class="notification-time">2 days ago</div>
+      </div>
+    </div>
   </section>
-
 
   <script>
     // Lấy thông tin user từ localStorage
@@ -29,11 +104,8 @@
     if (!user || !user.id) {
       window.location.href = 'index.html';
     } else {
-  fetchCourses();
-  fetchNotifications();
-}
-
-  
+      fetchNotifications();
+    }
 
     // Đăng xuất
     function logout() {
@@ -41,7 +113,68 @@
       window.location.href = 'index.html';
     }
 
-   
+    // Lấy thông báo từ server
+    async function fetchNotifications() {
+      try {
+        const response = await fetch(`http://localhost:5000/api/notifications?user_id=${user.id}`);
+        const data = await response.json();
+
+        if (data.success) {
+          displayNotifications(data.data);
+        } else {
+          console.error('Failed to fetch notifications:', data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching notifications:', error);
+      }
+    }
+
+    // Hiển thị thông báo
+    function displayNotifications(notifications) {
+      if (!notifications || notifications.length === 0) {
+        notificationList.innerHTML = '<div class="no-notifications">No notifications</div>';
+        return;
+      }
+
+      notificationList.innerHTML = notifications.map(notification => `
+        <div class="notification-item ${notification.is_read ? '' : 'unread'}" data-id="${notification.id}">
+          <div class="notification-message">${notification.message}</div>
+          <div class="notification-time">${new Date(notification.created_at).toLocaleString()}</div>
+          ${!notification.is_read ? `
+            <button class="mark-read-btn" onclick="markAsRead(${notification.id})">Mark as read</button>
+          ` : ''}
+        </div>
+      `).join('');
+    }
+
+    // Đánh dấu thông báo đã đọc
+    async function markAsRead(notificationId) {
+      try {
+        const response = await fetch(`http://localhost:5000/api/notifications/${notificationId}/read`, {
+          method: 'PUT'
+        });
+        const data = await response.json();
+
+        if (data.success) {
+          // Cập nhật UI
+          const notificationItem = document.querySelector(`.notification-item[data-id="${notificationId}"]`);
+          if (notificationItem) {
+            notificationItem.classList.remove('unread');
+            const markReadBtn = notificationItem.querySelector('.mark-read-btn');
+            if (markReadBtn) {
+              markReadBtn.remove();
+            }
+          }
+        } else {
+          console.error('Failed to mark notification as read:', data.message);
+        }
+      } catch (error) {
+        console.error('Error marking notification as read:', error);
+      }
+    }
+
+    // Tự động cập nhật thông báo mỗi 30 giây
+    setInterval(fetchNotifications, 30000);
   </script>
 </body>
 </html>
